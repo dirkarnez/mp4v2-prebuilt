@@ -43,7 +43,7 @@ jobs:
             -DBUILD_SHARED_LIBS=OFF ^
             -DBUILD_UTILS=ON ^
             -B./build &&^
-            cd build && cmake --build . && mingw32-make.exe
+            cd build && cmake --build . && mingw32-make.exe install
             
       - name: Archive Release
         uses: thedoctor0/zip-release@master
