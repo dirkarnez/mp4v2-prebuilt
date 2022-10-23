@@ -39,8 +39,8 @@ jobs:
             g++ --version && 
             autoreconf -i &&
             ./configure --help &&
-            ./configure X_LDFLAGS="$X_LDFLAGS -static" --disable-debug --enable-mingw-threads --enable-static --disable-shared --prefix="$(pwd)/${{ env.installationPath }}" &&
-            make VERBOSE=1 && make install
+            ./configure --disable-debug --enable-mingw-threads --enable-static --disable-shared --prefix="$(pwd)/${{ env.installationPath }}" &&
+            make VERBOSE=1 X_LDFLAGS=-static && make install
             
       - name: Archive Release
         uses: thedoctor0/zip-release@master
