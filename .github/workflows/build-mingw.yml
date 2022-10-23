@@ -37,6 +37,7 @@ jobs:
             export PATH="$workspace/mingw64:$workspace/mingw64/bin:$workspace/PortableGit-2.38.1-64-bit:$workspace/PortableGit-2.38.1-64-bit/bin:$workspace/msys64/usr/bin:/usr/bin" &&
             cd mp4v2 && 
             g++ --version && 
+            autoreconf -i &&
             ./configure --help &&
             ./configure --disable-shared --prefix="$(pwd)/${{ env.installationPath }}" &&
             make VERBOSE=1 && make install
