@@ -35,7 +35,7 @@ jobs:
         run: |
             workspace=$(pwd) &&
             export PATH="$workspace/mingw64:$workspace/mingw64/bin:$workspace/PortableGit-2.38.1-64-bit:$workspace/PortableGit-2.38.1-64-bit/bin:$workspace/msys64/usr/bin:/usr/bin" &&
-            export X_LDFLAGS="-static-libgcc -static-libstdc++" &&
+            export X_LDFLAGS="-static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread" &&
             cd mp4v2 && 
             g++ --version && 
             autoreconf -i &&
