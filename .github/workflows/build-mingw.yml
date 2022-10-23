@@ -39,7 +39,9 @@ jobs:
             cd mp4v2 &&^
             cmake.exe -G "MinGW Makefiles" ^
             -DCMAKE_BUILD_TYPE=Release ^
+            -DBUILD_SHARED=OFF ^
             -DBUILD_SHARED_LIBS=OFF ^
+            -DBUILD_UTILS=ON ^
             -DCMAKE_INSTALL_PREFIX="build/${{ env.cmakeInstallationPath }}" -B./build &&^
             cd build && cmake --build . && cmake --install . 
             
