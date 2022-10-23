@@ -4,14 +4,15 @@ on:
     # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
-  
+      - 'c*'
+      
 jobs:
   build:
     name: Create Release
     runs-on: windows-2019
     env:
       libraryName: mp4v2
-      cmakeInstallationPath: mp4v2-installation
+      installationPath: mp4v2-installation
       tagName: v2.1.1
       mingwTargetZip: mp4v2-${{ github.ref_name }}-x86_64-posix-seh-rev0-8.1.0.zip
     steps:
@@ -23,38 +24,33 @@ jobs:
         shell: cmd
         run:  cd /d ${{ github.workspace }} && curl https://github.com/2641797006/c/blob/master/GCC-zip/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z?raw=true -L --output x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z && dir && 7z.exe x x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z
         
-      - name: curl cmake-3.24.0-windows-x86_64.zip
-        shell: cmd
-        run: cd /d ${{ github.workspace }} && curl https://github.com/Kitware/CMake/releases/download/v3.24.0/cmake-3.24.0-windows-x86_64.zip -L --output cmake-3.24.0-windows-x86_64.zip && dir && 7z.exe x cmake-3.24.0-windows-x86_64.zip
-        
+      - name: Install MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: make autoconf automake libtool autogen perl
+
       - name: set PATH, check mingw version, cmake generate, build and install
-        shell: cmd
+        shell: msys2 {0}
         run: |
-            set WORKSPACE=%~dp0:\=/%
-            set PATH=^
-            ${{ github.workspace }}\mingw64;^
-            ${{ github.workspace }}\mingw64\bin;^
-            ${{ github.workspace }}\cmake-3.24.0-windows-x86_64\bin;^
-            gcc --version &&^
-            cd mp4v2 &&^
-            cmake.exe -G "MinGW Makefiles" ^
-            -DCMAKE_BUILD_TYPE=Release ^
-            -DBUILD_SHARED=OFF ^
-            -DBUILD_SHARED_LIBS=OFF ^
-            -DBUILD_UTILS=ON ^
-            -DCMAKE_INSTALL_PREFIX="build/${{ env.cmakeInstallationPath }}" -B./build &&^
-            cd build && cmake --build . && mingw32-make.exe install
+            workspace=$(pwd) &&
+            export PATH="$workspace/mingw64:$workspace/mingw64/bin:$workspace/PortableGit-2.38.1-64-bit:$workspace/PortableGit-2.38.1-64-bit/bin:$workspace/msys64/usr/bin:/usr/bin" &&
+            cd mp4v2 && 
+            g++ --version && 
+            ./configure --help &&
+            ./configure --disable-shared --prefix="$(pwd)/${{ env.installationPath }}" &&
+            make VERBOSE=1 && make install
             
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          directory: "mp4v2/build/${{ env.cmakeInstallationPath }}"
+          directory: "mp4v2/${{ env.installationPath }}"
           filename: "${{ env.mingwTargetZip }}"
-          
+       
       - name: Release prebuilt
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "mp4v2/build/${{ env.cmakeInstallationPath }}/${{ env.mingwTargetZip }}"
+          artifacts: "mp4v2/${{ env.installationPath }}/${{ env.mingwTargetZip }}"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
