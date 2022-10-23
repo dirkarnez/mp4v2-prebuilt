@@ -35,12 +35,13 @@ jobs:
         run: |
             workspace=$(pwd) &&
             export PATH="$workspace/mingw64:$workspace/mingw64/bin:$workspace/PortableGit-2.38.1-64-bit:$workspace/PortableGit-2.38.1-64-bit/bin:$workspace/msys64/usr/bin:/usr/bin" &&
+            export X_LDFLAGS="-static" &&
             cd mp4v2 && 
             g++ --version && 
             autoreconf -i &&
             ./configure --help &&
             ./configure --disable-debug --enable-mingw-threads --enable-static --disable-shared --prefix="$(pwd)/${{ env.installationPath }}" &&
-            make VERBOSE=1 X_LDFLAGS=-static && make install
+            make VERBOSE=1 && make install
             
       - name: Archive Release
         uses: thedoctor0/zip-release@master
