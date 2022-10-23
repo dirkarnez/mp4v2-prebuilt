@@ -42,19 +42,19 @@ jobs:
             -DBUILD_SHARED=OFF ^
             -DBUILD_SHARED_LIBS=OFF ^
             -DBUILD_UTILS=ON ^
-            -DCMAKE_INSTALL_PREFIX="build/${{ env.cmakeInstallationPath }}" -B./build &&^
+            -B./build &&^
             cd build && cmake --build . && mingw32-make.exe
             
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          directory: "mp4v2/build/${{ env.cmakeInstallationPath }}"
+          directory: "mp4v2/build"
           filename: "${{ env.mingwTargetZip }}"
           
       - name: Release prebuilt
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "mp4v2/build/${{ env.cmakeInstallationPath }}/${{ env.mingwTargetZip }}"
+          artifacts: "mp4v2/build/${{ env.mingwTargetZip }}"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
